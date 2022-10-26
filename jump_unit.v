@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 `include "jump_control.v"
+// `include "ALU.v"
 
 module jump_unit(
     input wire[31:0] PCin, address, ALUresult,
@@ -16,7 +17,7 @@ module jump_unit(
 
     // or jump_signal and unconditional
     wire final_ad_sel;
-    or o1(final_ad_sel,jump_control,unconditional);
+    or o1(final_ad_sel,jump_signal,unconditional);
 
     // increment program counter
     // PCin = PCin + 1

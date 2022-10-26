@@ -26,22 +26,23 @@ module test();
 
     initial begin
         reset = 1;#5;
-        reset = 0;
+        reset = 0;#5;
 
-        $display("op = %d ALU = %d address = %d",opcode,ALUresult, address);
+        $display("op = %d ALU = %d address = %d PC = %d",opcode,ALUresult, address, PCin);
         #20;
-        $display("op = %d ALU = %d address = %d",opcode,ALUresult, address);
+        $display("op = %d ALU = %d address = %d PC = %d",opcode,ALUresult, address, PCin);
 
         RegWrite = 1;
-        ALUinSel = 2'b10;
-        #5;
-        $display("op = %d ALU = %d address = %d final = %d",opcode,ALUresult, address, data_to_mem);
+        ALUinSel = 2'b01;
         next_address = 32'd2;
-        #21;
+        DataPCSel=1;
+        #31;
+        $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
+        #1;
         RegWrite = 0;
         ALUinSel = 2'b11;
         #5;
-        $display("op = %d ALU = %d address = %d final = %d",opcode,ALUresult, address, data_to_mem);
+        $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
 
         $finish;
     end
