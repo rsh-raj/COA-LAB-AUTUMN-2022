@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "adder.v"
+// `include "adder.v"
 
 module MUX_2X1(A,B,OUT,sel);
 	input wire[31:0] A,B;
@@ -17,12 +17,16 @@ module MUX_2_input(A,B,OUT,sel);
 	assign OUT = sel ? B : A;
 endmodule
 
-module MUX_4X1(IN,OUT,sel);
-	input wire[3:0][31:0] IN;
+module MUX_4X1(in1, in2, in3, in4, OUT,sel);
+	input wire[31:0] in1, in2, in3, in4;
 	output wire[31:0] OUT;
 	input wire[1:0] sel;
 
-	assign OUT = IN[sel];
+	wire[31:0] o1,o2;
+
+	MUX_2X1 m1(in1,in2,o1,sel[0]);
+	MUX_2X1 m2(in3,in4,o2,sel[0]);
+	MUX_2X1 m3(o1,o2,OUT,sel[1]);
 endmodule
 
 module adder_module(A,B,sum,carry);
@@ -57,13 +61,13 @@ module shift_module(A,B,controls,out);
 	// 10 left arithmetic shift
 	// 11 right arithmetic shift
 
-	wire[3:0][31:0] shift_ans;
-	assign shift_ans[0] = A<<B;
-	assign shift_ans[1] = A>>B;
-	assign shift_ans[2] = A<<<B;
-	assign shift_ans[3] = A>>>B;
+	wire[31:0] shift_ans0, shift_ans1, shift_ans2, shift_ans3;
+	assign shift_ans0 = A<<B;
+	assign shift_ans1 = A>>B;
+	assign shift_ans2 = A<<<B;
+	assign shift_ans3 = A>>>B;
 
-	MUX_4X1 m1(shift_ans,out,controls);
+	MUX_4X1 m1(shift_ans0,shift_ans1,shift_ans2,shift_ans3,out,controls);
 endmodule
 
 module priority_encoder_32bit(
@@ -101,12 +105,12 @@ module sign_extension_5_to_32(A,result);
 endmodule
 
 module ALU(A,B,controls,flags,result_final);
-	input wire[31:0] A,B;
-	output wire[31:0] result_final;
+	input signed [31:0] A,B;
+	output signed [31:0] result_final;
 	input wire[4:0] controls;
 	output wire[2:0] flags;
 
-	wire[1:0][31:0] out;
+	wire[31:0] out0, out1;
 	wire[1:0] sel;
 	wire[31:0] negb;
 	assign negb = ~B;
@@ -121,24 +125,24 @@ module ALU(A,B,controls,flags,result_final);
 	assign sel[1] = sel_line[1];
 
 
-	MUX_2X1 in_mux1(A, 32'b1, out[0], sel[0]);
-	MUX_2X1 in_mux2(B, negb, out[1], sel[1]);
+	MUX_2X1 in_mux1(A, 32'b1, out0, sel[0]);
+	MUX_2X1 in_mux2(B, negb, out1, sel[1]);
 
 	// out[0] is rs and out[1] is rt
 	// IN shift we have to do rs left or right shifted by rt
 
-	wire[3:0][31:0] result;
-	wire[1:0][31:0] val;
+	wire[31:0] result0, result1, result2, result3;
+	wire[31:0] val0, val1;
 
-	adder_module a1(out[0],out[1],result[0],carry);
-	AND_module a(out[0],out[1],result[1]);
-	XOR_module x(out[0],out[1],result[2]);
-	shift_module s(out[0],out[1],controls[3:2],result[3]);
-	diff d(out[0],out[1],val[1]);
+	adder_module a1(out0,out1,result0,carry);
+	AND_module a(out0,out1,result1);
+	XOR_module x(out0,out1,result2);
+	shift_module s(out0,out1,controls[3:2],result3);
+	diff d(out0,out1,val1);
 
-	MUX_4X1 mux1(result,val[0],controls[1:0]);
+	MUX_4X1 mux1(result0,result1,result2,result3,val0,controls[1:0]);
 
-	MUX_2X1 mux2(val[0],val[1],result_final,controls[4]);
+	MUX_2X1 mux2(val0,val1,result_final,controls[4]);
 	assign flags[2] = carry;   // carry flag
 	assign flags[1] = result_final == 0 ? 1 : 0;        // zero flag
 	assign flags[0] = result_final[31];        // sign flag

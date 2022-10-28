@@ -11,10 +11,7 @@ module control_unit(
     reg [16:0] controls;
     assign {DataPCSel, RegSelect, ALUinSel, RegWrite, MemRead, MemWrite, MemtoReg, AdSel, unconditional, conditional, ALUop, halt} = controls;
 
-    always@(posedge reset)
-    begin
-        controls <= 17'b0;
-    end
+    // controls = (reset) ? 17'b0 : controls;
     
     always@*
         case(opcode)

@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
-`include "ALU.v"
-`include "instruction_mem.v"
-`include "regfile.v"
-`include "data_mem.v"
-`include "ALU_control.v"
+// `include "ALU.v"
+// `include "instruction_mem.v"
+// `include "regfile.v"
+// `include "data_mem.v"
+// `include "ALU_control.v"
 
 module MUX_2X1_reg(A,B,OUT,sel);
 	input wire[4:0] A,B;
@@ -20,13 +20,28 @@ module sign_extension_16_to_32(A,result);
 	assign result = {{16{1'b0}}, A}; 
 endmodule
 
+module dff(input_data, output_data, clk);
+    input signed[31:0] input_data;
+    input wire clk;
+    output signed[31:0] output_data;
+
+    reg[31:0] buffer = 0;
+    assign output_data = buffer;
+
+    always@(posedge clk)
+    begin
+        buffer = input_data;
+    end
+endmodule
+
 module arithmetic_and_memory_unit(
     input wire[31:0] PCin,
     input wire clk,reset,
     input wire RegWrite,MemRead,MemWrite,MemtoReg,DataPCSel,RegSelect,
     input wire[2:0] ALUop,
     input wire[1:0] ALUinSel,
-    output wire[31:0] ALUresult, address,data_to_mem,
+    output wire[31:0] ALUresult, address,
+    output signed [31:0] output_data,
     output wire[2:0] flags,
     output wire[5:0] opcode
 );
@@ -52,10 +67,10 @@ module arithmetic_and_memory_unit(
 
     sign_extension_16_to_32 set(immediate,address);
 
-    wire[3:0][31:0] mux_in;
-    assign mux_in = {32'b1,address,32'b0,data2};
+    wire[31:0] mux_in0, mux_in1,mux_in2,mux_in3;
+    assign {mux_in3, mux_in2,mux_in1,mux_in0} = {32'b1,address,32'b0,data2};
 
-    MUX_4X1 ALU_sel(mux_in,data2_f,ALUinSel);
+    MUX_4X1 ALU_sel(mux_in0, mux_in1, mux_in2, mux_in3,data2_f,ALUinSel);
 
     wire[4:0] ALU_control_signal;
     ALU_control ac(ALUop,instruction_out[31:26],ALU_control_signal);
@@ -65,7 +80,10 @@ module arithmetic_and_memory_unit(
     wire[31:0] data_out;
     data_memory dmem(ALUresult, data_out, data2, MemWrite, MemRead, clk);
 
+    wire[31:0] data_to_mem;
     MUX_2X1 memtoreg(data_out,ALUresult,data_to_mem,MemtoReg);
+
+    dff flip_flop(data_to_mem, output_data, clk);
 
     // Now we will use a MUX to select between PCin +1 and the data_to_mem, and the output will be in wire writeData
 
