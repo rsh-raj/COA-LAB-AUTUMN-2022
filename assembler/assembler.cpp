@@ -76,6 +76,18 @@ string decTobinary(int n, int bits)
     return binaryNo;
 }
 unordered_map<string, int> labelTable;
+void inserLabel(string line, int lineNo)
+{
+    stringstream ss(line);
+    string word;
+    ss >> word;
+
+    if (word.find(":") != string::npos)
+    {
+        labelTable[word.substr(0, word.length() - 1)] = lineNo;
+    }
+}
+
 string encode(string line, int lineNo)
 {
 
@@ -89,8 +101,9 @@ string encode(string line, int lineNo)
     makeEncodingTable(formatTable, opCodeTable);
 
     stringstream ss(line);
-    string word;
+    string word, instruction;
     ss >> word;
+    instruction = word;
     if (word == "shrl")
     {
         // handling the shrl case (need to append i in case of shrl rs,sh)
@@ -113,7 +126,7 @@ string encode(string line, int lineNo)
     }
     if (word.find(":") != string::npos)
     {
-        labelTable[word.substr(0, word.length() - 1)] = lineNo;
+        // labelTable[word.substr(0, word.length() - 1)] = lineNo;
         return "";
     }
     string encoding = "", opCode = "", func = "";
@@ -230,6 +243,10 @@ string encode(string line, int lineNo)
             // return labelValue;
         }
     }
+    if (instruction == "lw")
+    {
+        encoding = encoding + "\n" + encoding;
+    }
     cout << "\n";
     cout << encoding << endl;
     cout << "---------------------------------------------"
@@ -239,21 +256,33 @@ string encode(string line, int lineNo)
 }
 int main(int argc, char const *argv[])
 {
-    if(argc==1){
-        cout<<"Please provide the input file name as command line argument"<<endl;
+    if (argc == 1)
+    {
+        cout << "Please provide the input file name as command line argument" << endl;
         return 0;
     }
-    string filename=argv[1];
-    
+    string filename = argv[1];
+
     // cout<<filename;
     ifstream inputFile;
     ofstream outputFile, outputFile2;
     inputFile.open(filename);
     outputFile.open("memory.txt");
     outputFile2.open(filename.substr(0, filename.find(".")) + ".coe");
-    outputFile2<<"memory_initialization_radix=2;\nmemory_initialization_vector=\n";
+    outputFile2 << "memory_initialization_radix=2;\nmemory_initialization_vector=\n";
 
     int lineNo = 0;
+    while (inputFile)
+    {
+        string line;
+        getline(inputFile, line);
+
+        lineNo++;
+        inserLabel(line, lineNo);
+    }
+    inputFile.close();
+    inputFile.open(filename);
+    lineNo = 0;
 
     while (inputFile)
     {
@@ -265,12 +294,12 @@ int main(int argc, char const *argv[])
         if (encodingString != "")
         {
             outputFile << encodingString << endl;
-            outputFile2<<encodingString<<','<<endl;
+            outputFile2 << encodingString << ',' << endl;
         }
     }
     inputFile.close();
     outputFile.close();
-    cout << "Encoding successfully written to memory.txt && "<<filename.substr(0, filename.find(".")) + ".coe" << endl;
+    cout << "Encoding successfully written to memory.txt && " << filename.substr(0, filename.find(".")) + ".coe" << endl;
 
     return 0;
 }
