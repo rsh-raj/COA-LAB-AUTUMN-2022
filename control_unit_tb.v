@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "control_unit.v"
+// `include "control_unit.v"
 
 module test();
     reg[5:0] opcode;

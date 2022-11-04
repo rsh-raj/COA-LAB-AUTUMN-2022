@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "CPU.v"
+// `include "CPU.v"
 
 module test();
     reg clk = 0, reset = 0, haltext = 0;
@@ -8,16 +8,17 @@ module test();
     CPU c(clk,reset,haltext,out);
 
     initial begin
-        reset = 1;#5;
-        reset = 0;#5;
+        // reset = 0;#100;
+        #100;
+        reset = 1;#1;
+        reset = 0;
 
-        #1600;
+        #500;
         $finish;  
     end
 
     always@(posedge clk)
     begin
-        #10;
         $display("out = %d", out);
     end
 

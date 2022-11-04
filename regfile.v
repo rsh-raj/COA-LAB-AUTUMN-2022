@@ -3,7 +3,7 @@
 
 module regfile(readReg1, readReg2, writeReg, data1, data2, clk, writeData, RegWrite, reset);
     input wire[4:0] readReg1, readReg2, writeReg;
-    output wire[31:0] data1, data2;
+    output wire[31:0] data1,data2;
     input wire[31:0] writeData;
     input wire RegWrite, clk, reset;    // Control Signal for writing on the write register
 
@@ -11,6 +11,7 @@ module regfile(readReg1, readReg2, writeReg, data1, data2, clk, writeData, RegWr
     assign data1 = register[readReg1];
     assign data2 = register[readReg2];
 
+    // how to ahve asynchronous reset without having to have multiple flip flops sensitivities ??
     always@(posedge clk)
     begin
         if(reset)

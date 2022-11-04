@@ -51,7 +51,7 @@ module arithmetic_and_memory_unit(
     wire[31:0] writeData, data1, data2, data2_f;
     wire[15:0] immediate;
 
-    instruction_memory im(PCin,instruction_out);
+    instruction_memory im(clk,PCin,instruction_out);
 
     // additional
     // assign i_out = instruction_out;
@@ -84,6 +84,7 @@ module arithmetic_and_memory_unit(
     MUX_2X1 memtoreg(data_out,ALUresult,data_to_mem,MemtoReg);
 
     dff flip_flop(data_to_mem, output_data, clk);
+    // assign output_data = data_to_mem;
 
     // Now we will use a MUX to select between PCin +1 and the data_to_mem, and the output will be in wire writeData
 

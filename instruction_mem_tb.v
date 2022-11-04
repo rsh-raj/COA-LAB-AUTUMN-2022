@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "instruction_mem.v"
+// `include "instruction_mem.v"
 
 module test();
     reg[31:0] add_in;

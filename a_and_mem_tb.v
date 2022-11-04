@@ -14,7 +14,7 @@ module test();
 
     arithmetic_and_memory_unit au(
     PCin,
-    clk,reset,
+    clkout,reset,
     RegWrite,MemRead,MemWrite,MemtoReg,DataPCSel,RegSelect,
     ALUop,
     ALUinSel,
@@ -22,10 +22,10 @@ module test();
     flags,
     opcode);
 
-    program_counter_unit pc(next_address,clk, reset,PCin);
+    program_counter_unit pc(next_address,clk, reset,haltext,halt,PCin,clkout);
 
     initial begin
-        reset = 1;#5;
+        reset = 1;#21;
         reset = 0;#5;
 
         $display("op = %d ALU = %d address = %d PC = %d",opcode,ALUresult, address, PCin);
@@ -34,7 +34,7 @@ module test();
 
         RegWrite = 1;
         ALUinSel = 2'b01;
-        next_address = 32'd2;
+        next_address = 32'd1;
         DataPCSel=1;
         #31;
         $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
@@ -44,6 +44,14 @@ module test();
         #5;
         $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
 
+        next_address = 32'd2;
+        #40;
+        $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
+        #40;
+        $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
+        #40;
+        $display("op = %d ALU = %d address = %d final = %d PC = %d",opcode,ALUresult, address, data_to_mem, PCin);
+        
         $finish;
     end
 

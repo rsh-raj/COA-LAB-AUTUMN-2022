@@ -144,7 +144,7 @@ module ALU(A,B,controls,flags,result_final);
 
 	MUX_2X1 mux2(val0,val1,result_final,controls[4]);
 	assign flags[2] = carry;   // carry flag
-	assign flags[1] = result_final == 0 ? 1 : 0;        // zero flag
+	assign flags[1] = result_final == 32'b0 ? 1 : 0;        // zero flag
 	assign flags[0] = result_final[31];        // sign flag
 
 endmodule

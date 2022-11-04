@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "program_counter.v"
+// `include "program_counter.v"
 
 module test();
     reg[31:0] next = 32'd34;

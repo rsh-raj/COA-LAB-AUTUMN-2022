@@ -4,7 +4,7 @@ module program_counter(next_addr, out_addr, clk, reset);
     input wire[31:0] next_addr;
     output wire[31:0] out_addr;
     input wire clk, reset;
-    reg[31:0] buffer = 32'b0;
+    reg[31:0] buffer;
 
     always@(posedge clk or posedge reset)
     begin

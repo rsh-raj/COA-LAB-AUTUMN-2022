@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "ALU_control.v"
+// `include "ALU_control.v"
 
 module test();
     reg[2:0] ALU;

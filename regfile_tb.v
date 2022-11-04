@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "regfile.v"
+// `include "regfile.v"
 
 module test();
     reg[4:0] readReg1, readReg2, writeReg;

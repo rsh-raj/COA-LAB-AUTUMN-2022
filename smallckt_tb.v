@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "smallckt.v"
+// `include "smallckt.v"
 
 module test();
     reg[4:0] r1,r2,ALUc = 5'b0;

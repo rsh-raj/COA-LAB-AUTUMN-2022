@@ -11,13 +11,13 @@ module jump_control(condition, flags, out);
 
     always@*
         casex({condition, flags})
-            6'b000xxx : #5 controls <= 1'b0; // non branch op
-            6'b001xx1 : #5 controls <= 1'b1; // bltz rs,L
-            6'b010x1x : #5 controls <= 1'b1; // bz rs,L
-            6'b011x0x : #5 controls <= 1'b1; // bnz rs,L
-            6'b1001xx : #5 controls <= 1'b1; // bcy L
-            6'b1010xx : #5 controls <= 1'b1; // bncy L
-            default: #5 controls <= 1'b0;    // any other op
+            6'b000xxx :  controls <= 1'b0; // non branch op
+            6'b001xx1 :  controls <= 1'b1; // bltz rs,L
+            6'b010x1x :  controls <= 1'b1; // bz rs,L
+            6'b011x0x :  controls <= 1'b1; // bnz rs,L
+            6'b1001xx :  controls <= 1'b1; // bcy L
+            6'b1010xx :  controls <= 1'b1; // bncy L
+            default:  controls <= 1'b0;    // any other op
         endcase
 
 endmodule
