@@ -5,7 +5,7 @@
 // `include "arithmetic_and_memory_unit.v"
 
 module CPU(
-    input wire clk,reset,haltext,
+    input wire clk,reset,cont,
     output wire[31:0] out
 );
 
@@ -22,7 +22,7 @@ module CPU(
 
     arithmetic_and_memory_unit au(PCin,clk_out,reset,RegWrite,MemRead,MemWrite,MemtoReg,DataPCSel,RegSelect,ALUop,ALUinSel,ALUresult, address,out,flags,opcode);
 
-    program_counter_unit pcu(next_address,clk, reset, haltext, halt, PCin, clk_out);
+    program_counter_unit pcu(next_address,clk, reset, cont, halt, PCin, clk_out);
 
     jump_unit ju(PCin, address, ALUresult, AdSel,unconditional, conditional, flags, next_address);
 

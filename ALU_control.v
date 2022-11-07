@@ -14,6 +14,7 @@ module ALU_control(ALUop,funct,out);
             9'b010xxxxxx :  controls <= 5'b00111; // shift right logical
             9'b011xxxxxx :  controls <= 5'b01111; // shift right arithmetic
             9'b100xxxxxx :  controls <= 5'b01100; // complement immidiate
+            9'b101xxxxxx :  controls <= 5'b10000; // for beq instruction
             9'b111000001 :  controls <= 5'b00000; // add rs,rt
             9'b111000010 :  controls <= 5'b01100; // comp rs,rt
             9'b111000011 :  controls <= 5'b00001; // and rs,rt

@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
 // `include "CPU.v"
 
-module test();
-    reg clk = 0, reset = 0, haltext = 0;
+module test5();
+    reg clk = 0, reset = 0, cont= 0;
     wire[31:0] out;
 
-    CPU c(clk,reset,haltext,out);
+    CPU c(clk,reset,cont,out);
 
     initial begin
         // reset = 0;#100;
-        #100;
+        #2;
         reset = 1;#1;
         reset = 0;
 
-        #500;
+        #1000;
         $finish;  
     end
 
@@ -23,7 +23,7 @@ module test();
     end
 
     always begin
-        #20;
+        #2;
         clk = ~clk;
     end
 endmodule

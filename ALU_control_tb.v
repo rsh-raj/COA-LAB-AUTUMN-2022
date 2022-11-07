@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 // `include "ALU_control.v"
 
-module test();
+module test2();
     reg[2:0] ALU;
     reg[5:0] funct;
     wire[4:0] out;
@@ -14,7 +14,7 @@ module test();
         {ALU,funct} = 9'b001010101;
         #6;
         $display("out = %b%b%b%b%b", out[4], out[3], out[2], out[1], out[0]);
-        {ALU,funct} = 9'b000010101;
+        {ALU,funct} = 9'b111000101;
         #10;
         $display("out = %b%b%b%b%b", out[4], out[3], out[2], out[1], out[0]);
         // #5;

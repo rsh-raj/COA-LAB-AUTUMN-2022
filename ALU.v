@@ -76,7 +76,7 @@ module priority_encoder_32bit(
   );
   	integer i;
   	always @* begin
-    	out = 0; // default value if 'in' is all 0's
+    	out = 31; // default value if 'in' is all 0's
     	for (i=31; i>=0; i=i-1)
         	if (in[i]) out = i;
   	end
@@ -101,7 +101,7 @@ module sign_extension_5_to_32(A,result);
 	input wire[4:0] A;
 	output wire[31:0] result;
 
-	assign result = {{27{1'b0}}, A}; 
+	assign result = {{27{A[4]}}, A}; 
 endmodule
 
 module ALU(A,B,controls,flags,result_final);
@@ -144,7 +144,7 @@ module ALU(A,B,controls,flags,result_final);
 
 	MUX_2X1 mux2(val0,val1,result_final,controls[4]);
 	assign flags[2] = carry;   // carry flag
-	assign flags[1] = result_final == 32'b0 ? 1 : 0;        // zero flag
+	assign flags[1] = result_final == 0 ? 1 : 0;        // zero flag
 	assign flags[0] = result_final[31];        // sign flag
 
 endmodule

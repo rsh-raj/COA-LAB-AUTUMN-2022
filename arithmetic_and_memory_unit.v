@@ -17,7 +17,7 @@ module sign_extension_16_to_32(A,result);
 	input wire[15:0] A;
 	output wire[31:0] result;
 
-	assign result = {{16{1'b0}}, A}; 
+	assign result = {{16{A[15]}}, A}; 
 endmodule
 
 module dff(input_data, output_data, clk);
@@ -51,7 +51,9 @@ module arithmetic_and_memory_unit(
     wire[31:0] writeData, data1, data2, data2_f;
     wire[15:0] immediate;
 
-    instruction_memory im(clk,PCin,instruction_out);
+    wire[9:0] imem_in;
+    assign imem_in = PCin[9:0];
+    instruction_memory im(clk,imem_in,instruction_out);
 
     // additional
     // assign i_out = instruction_out;
@@ -73,12 +75,14 @@ module arithmetic_and_memory_unit(
     MUX_4X1 ALU_sel(mux_in0, mux_in1, mux_in2, mux_in3,data2_f,ALUinSel);
 
     wire[4:0] ALU_control_signal;
-    ALU_control ac(ALUop,instruction_out[31:26],ALU_control_signal);
+    ALU_control ac(ALUop,instruction_out[5:0],ALU_control_signal);
 
     ALU alu_unit(data1,data2_f,ALU_control_signal,flags,ALUresult);
 
     wire[31:0] data_out;
-    data_memory dmem(ALUresult, data_out, data2, MemWrite, MemRead, clk);
+    wire[9:0] dmem_in;
+    assign dmem_in = ALUresult[9:0];
+    data_memory dmem(dmem_in, data_out, data2, MemWrite, MemRead, clk);
 
     wire[31:0] data_to_mem;
     MUX_2X1 memtoreg(data_out,ALUresult,data_to_mem,MemtoReg);

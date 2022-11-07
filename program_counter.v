@@ -5,6 +5,7 @@ module program_counter(next_addr, out_addr, clk, reset);
     output wire[31:0] out_addr;
     input wire clk, reset;
     reg[31:0] buffer;
+    wire[31:0] out_addr_temp;
 
     always@(posedge clk or posedge reset)
     begin
@@ -12,5 +13,6 @@ module program_counter(next_addr, out_addr, clk, reset);
         else buffer = next_addr;
     end
 
+    
     assign out_addr = buffer;
 endmodule

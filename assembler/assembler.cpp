@@ -19,7 +19,7 @@ void makeEncodingTable(vector<format> &formatTable, unordered_map<string, pair<i
     formatTable[0].format.insert(formatTable[0].format.end(), {{6, "OC"}, {5, "rs"}, {5, "rt"}, {10, "DC"}, {6, "func"}});
     formatTable[1].instructions.insert(formatTable[1].instructions.end(), {"addi", "compi", "shll", "shrli", "shra"});
     formatTable[1].format.insert(formatTable[1].format.end(), {{6, "OC"}, {5, "rs"}, {5, "rs"}, {16, "IMM"}});
-    formatTable[2].instructions.insert(formatTable[2].instructions.end(), {"lw", "sw"});
+    formatTable[2].instructions.insert(formatTable[2].instructions.end(), {"lw", "sw", "move"});
     formatTable[2].format.insert(formatTable[2].format.end(), {{6, "OC"}, {5, "rt"}, {5, "rs"}, {16, "IMM"}});
     formatTable[3].instructions.insert(formatTable[3].instructions.end(), {"br"});
     formatTable[3].format.insert(formatTable[3].format.end(), {{6, "OC"}, {5, "DC"}, {5, "rs"}, {16, "DC"}});
@@ -29,6 +29,8 @@ void makeEncodingTable(vector<format> &formatTable, unordered_map<string, pair<i
     formatTable[5].format.insert(formatTable[5].format.end(), {{6, "OC"}, {10, "DC"}, {16, "L"}});
     formatTable[6].instructions.insert(formatTable[6].instructions.end(), {"halt", "nop"});
     formatTable[6].format.insert(formatTable[6].format.end(), {{6, "OC"}, {26, "DC"}});
+    formatTable[7].instructions.insert(formatTable[7].instructions.end(), {"beq"});
+    formatTable[7].format.insert(formatTable[7].format.end(), {{6, "OC"}, {5, "rt"}, {5, "rs"}, {16, "L"}});
     // opCodeTable["add"]={0000000,000001}
     opCodeTable["add"] = {0, 1};
     opCodeTable["comp"] = {0, 2};
@@ -53,13 +55,27 @@ void makeEncodingTable(vector<format> &formatTable, unordered_map<string, pair<i
     opCodeTable["bcy"] = {13, 0};
     opCodeTable["bncy"] = {14, 0};
     opCodeTable["bl"] = {15, 0};
+    opCodeTable["move"] = {16,0};
+    opCodeTable["beq"] = {17,0};
     opCodeTable["halt"] = {63, 0};
     opCodeTable["nop"] = {62, 0};
 }
+
+bool isJump(string word){
+    if(word == "bltz" || word == "bz" || word == "bnz" || word == "br" || word == "b" || word == "bcy" || word == "bncy" || word == "bl" || word == "beq") return true;
+    return false;
+}
+
+// jump :- bltz bz bnz br b bcy bncy bl
 string decTobinary(int n, int bits)
 {
     string binaryNo = "";
-    // cout<<n;
+    int temp = 0;
+    if(n < 0){
+        n = -n;
+        temp = 1;
+    }
+
     while (n)
     {
 
@@ -72,6 +88,29 @@ string decTobinary(int n, int bits)
     {
         binaryNo = "0" + binaryNo;
         remainingBits--;
+    }
+
+    int len = binaryNo.length();
+
+    if(temp == 1){
+
+        for(int i = 0; i < len; i++){
+            if(binaryNo[i] == '0'){
+                binaryNo[i] = '1';
+            }
+            else if(binaryNo[i] == '1'){
+                binaryNo[i] = '0';
+            }
+        }
+
+        int index = len-1;
+        while(binaryNo[index] != '0'){
+            binaryNo[index] = '0';
+            index--;
+        }
+
+        binaryNo[index] = '1';
+        cout<<binaryNo<<endl;
     }
     return binaryNo;
 }
@@ -88,6 +127,7 @@ void inserLabel(string line, int lineNo)
     }
 }
 
+// Empty line case handled, can have line breaks in code
 string encode(string line, int lineNo)
 {
 
@@ -97,13 +137,22 @@ string encode(string line, int lineNo)
 
     cout << "Encoding" << ' ' << line << "----------------" << endl;
     unordered_map<string, pair<int, int>> opCodeTable;
-    vector<format> formatTable(7);
+    vector<format> formatTable(8);
     makeEncodingTable(formatTable, opCodeTable);
 
     stringstream ss(line);
     string word, instruction;
     ss >> word;
     instruction = word;
+    
+    int loadimm = 0;
+    int jump = 0;
+    if(isJump(word)) jump = 1;
+    if(word == "ld"){
+        loadimm = 1;
+        word = "compi";
+    }
+
     if (word == "shrl")
     {
         // handling the shrl case (need to append i in case of shrl rs,sh)
@@ -224,7 +273,11 @@ string encode(string line, int lineNo)
         {
             if (immValue == "")
                 ss >> word;
-            immValue = decTobinary(stoi(word), 16);
+
+            int val = stoi(word);
+            if(loadimm == 1) val = -val;
+            immValue = decTobinary(val, 16);
+
             for (int i = 0; i < frmt.first; i++)
             {
                 encoding[curr_bit++] = immValue[i];
@@ -247,6 +300,8 @@ string encode(string line, int lineNo)
     {
         encoding = encoding + "\n" + encoding;
     }
+
+    if(jump == 1) encoding = encoding + "\n" + "11111000000000000000000000000000";
     cout << "\n";
     cout << encoding << endl;
     cout << "---------------------------------------------"
@@ -271,25 +326,44 @@ int main(int argc, char const *argv[])
     outputFile2.open(filename.substr(0, filename.find(".")) + ".coe");
     outputFile2 << "memory_initialization_radix=2;\nmemory_initialization_vector=\n";
 
-    int lineNo = 0;
+
+    // constructing the label table
+    int NumInstrictions = 0;
     while (inputFile)
     {
         string line;
         getline(inputFile, line);
 
-        lineNo++;
-        inserLabel(line, lineNo);
+        stringstream ss(line);
+        string word, instruction;
+        ss >> word;
+
+        // Add jump instructions as well // Added
+        // Cover cases for comments as well // Done
+        if(word == "lw" || isJump(word)) NumInstrictions += 2;
+
+        else if(word.find(":") != string::npos){
+            inserLabel(line, NumInstrictions);
+        }
+
+        else if(word == "" || word == "#") NumInstrictions += 0; 
+        else NumInstrictions += 1;
+
     }
     inputFile.close();
     inputFile.open(filename);
-    lineNo = 0;
+    int lineNo = 0;
 
+    
     while (inputFile)
     {
         string line;
         getline(inputFile, line);
 
         lineNo++;
+
+        if(line[0] == '#') continue;
+
         string encodingString = encode(line, lineNo);
         if (encodingString != "")
         {
@@ -300,6 +374,6 @@ int main(int argc, char const *argv[])
     inputFile.close();
     outputFile.close();
     cout << "Encoding successfully written to memory.txt && " << filename.substr(0, filename.find(".")) + ".coe" << endl;
-
+    
     return 0;
 }

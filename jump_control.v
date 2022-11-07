@@ -17,6 +17,7 @@ module jump_control(condition, flags, out);
             6'b011x0x :  controls <= 1'b1; // bnz rs,L
             6'b1001xx :  controls <= 1'b1; // bcy L
             6'b1010xx :  controls <= 1'b1; // bncy L
+            6'b110xx1 :  controls <= 1'b1; // beq rs, rt, L
             default:  controls <= 1'b0;    // any other op
         endcase
 
