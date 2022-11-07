@@ -1,4 +1,4 @@
-file=test.s
+file=test2.s
 outputFile: a.out
 	./a.out $(file)
 
