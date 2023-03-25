@@ -2,33 +2,28 @@
 // regfile worlking fine
 
 module data_memory(address_in, data_out, write_data, MemWrite, MemRead, clk);
+    input wire[9:0] address_in;
+	 input wire MemWrite, MemRead, clk;
+	 output wire[31:0] data_out;
+	 input wire[31:0] write_data;
     
+<<<<<<< HEAD:KGPMini RISC Processor/data_mem.v
     input wire[9:0] address_in;
     input wire[31:0] write_data;
     output wire[31:0] data_out;
     input wire MemWrite, MemRead, clk;
     reg[31:0] buffer;
     reg[31:0] register[1024:0];
+=======
+bram DataMemory (
+  .clka(clk), // input clka
+  .ena(MemRead), // input ena
+  .wea(MemWrite), // input [0 : 0] wea
+  .addra(address_in), // input [9 : 0] addra
+  .dina(write_data), // input [31 : 0] dina
+  .douta(data_out) // output [31 : 0] douta
+);
+>>>>>>> 6d10a3e41f2c3288dac31e8393b84b6678c682d2:data_mem.v
 
-    always@(posedge clk)
-    begin
-        
-        if(MemWrite)
-            begin
-                register[address_in] = write_data;
-            end
-        
-        buffer <= MemRead ? register[address_in] : 32'b0;
-    end
-
-    assign data_out = buffer;
-
-    // assign data_out = MemRead ? register[address_in] : 32'b0;
 
 endmodule
-
-// Do not use assign statement inside of an always block, can only be done for reg type variable, not for wire type variable
-
-// For reading an input, the write signal and the reset signal must be off
-
-// reset is not really needed
