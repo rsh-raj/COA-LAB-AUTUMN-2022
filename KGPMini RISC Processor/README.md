@@ -1,4 +1,6 @@
 # KGPMini RISC Processor
+Problem Statement: [KGPMini RISC Processor](Problem_Statement_ISA22.pdf)
+
 # Steps to run
 
 1. Clone the repository
