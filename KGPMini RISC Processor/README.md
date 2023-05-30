@@ -1,6 +1,6 @@
 # KGPMini RISC Processor
-Problem Statement: [KGPMini RISC Processor](Problem_Statement_ISA22.pdf)
-
+Problem Statement: [KGPMini RISC Processor](Problem_Statement_ISA22.pdf) </br>
+Instruction Set Encoding & Datapath: [Instruction Set Encoding & Datapath](isa_encoding.pdf)
 # Steps to run
 
 1. Clone the repository
